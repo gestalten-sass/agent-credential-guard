@@ -2,21 +2,11 @@
 
 Linux-first Guardrail gegen Secret-Leaks in AI-Agent- und Git-Workflows.
 
-## Build
+## Installation (ohne Go)
 
 ```bash
-go build -o guard ./cmd/guard
+curl -fsSL https://raw.githubusercontent.com/gestalten-sass/agent-credential-guard/master/scripts/install.sh | bash
 ```
-
-## Installation
-
-```bash
-go install ./cmd/guard
-# oder
-./scripts/install.sh
-```
-
-Hinweis: Stelle sicher, dass `$(go env GOPATH)/bin` in deinem `PATH` liegt.
 
 ## Schnellstart
 
@@ -44,6 +34,13 @@ Optional im Repo-Root: `.guard.yaml`
 - `strict_mode`
 
 Beispiel: `.guard.yaml.example`
+
+## Entwicklung (mit Go)
+
+```bash
+go test ./...
+go build -o guard ./cmd/guard
+```
 
 ## Beispiele
 

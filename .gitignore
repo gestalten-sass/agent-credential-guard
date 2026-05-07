@@ -1,5 +1,5 @@
 # Build output
-guard
+/guard
 
 # Local runtime/config
 .guard.yaml
