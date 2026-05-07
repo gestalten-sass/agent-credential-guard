@@ -30,9 +30,17 @@ append_path_if_needed() {
 maybe_install_global_hook() {
   local guard_bin="$1"
 
+  if [[ "${GUARD_AUTO_HOOK:-}" == "1" ]]; then
+    "$guard_bin" hook install --global
+    "$guard_bin" hook status --global || true
+    return
+  fi
+
   if [[ ! -t 0 ]]; then
     echo "Hinweis: Kein interaktives Terminal. Globalen Hook manuell aktivieren mit:"
     echo "  guard hook install --global"
+    echo "Oder direkt automatisch bei Installation:"
+    echo '  curl -fsSL https://raw.githubusercontent.com/gestalten-sass/agent-credential-guard/master/scripts/install.sh | GUARD_AUTO_HOOK=1 bash'
     return
   fi
 
