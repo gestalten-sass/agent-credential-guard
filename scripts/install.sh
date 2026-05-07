@@ -2,14 +2,29 @@
 set -euo pipefail
 
 REPO="gestalten-sass/agent-credential-guard"
-INSTALL_DIR="${HOME}/.local/bin"
 BINARY_NAME="guard"
+USER_INSTALL_DIR="${HOME}/.local/bin"
+SYSTEM_INSTALL_DIR="/usr/local/bin"
 
 need_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
     echo "Fehlt: $1" >&2
     exit 1
   }
+}
+
+append_path_if_needed() {
+  local rc_file="$1"
+  local line='export PATH="$HOME/.local/bin:$PATH"'
+
+  if [[ ! -f "$rc_file" ]]; then
+    printf '%s\n' "$line" > "$rc_file"
+    return
+  fi
+
+  if ! grep -Fq '$HOME/.local/bin' "$rc_file"; then
+    printf '\n%s\n' "$line" >> "$rc_file"
+  fi
 }
 
 need_cmd curl
@@ -43,11 +58,40 @@ trap 'rm -rf "$tmpdir"' EXIT
 curl -fL "$url" -o "$tmpdir/$asset"
 tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
-mkdir -p "$INSTALL_DIR"
-install -m 0755 "$tmpdir/guard-linux-${asset_arch}" "$INSTALL_DIR/$BINARY_NAME"
+src_bin="$tmpdir/guard-linux-${asset_arch}"
 
-echo "Installiert: $INSTALL_DIR/$BINARY_NAME"
-if ! command -v guard >/dev/null 2>&1; then
-  echo "Hinweis: $INSTALL_DIR ist evtl. nicht im PATH."
-  echo 'Temporär: export PATH="$HOME/.local/bin:$PATH"'
+if [[ -w "$SYSTEM_INSTALL_DIR" ]]; then
+  install_dir="$SYSTEM_INSTALL_DIR"
+  install -m 0755 "$src_bin" "$install_dir/$BINARY_NAME"
+  echo "Installiert: $install_dir/$BINARY_NAME"
+  echo "Fertig. Du kannst direkt 'guard version' ausfuehren."
+  exit 0
 fi
+
+if command -v sudo >/dev/null 2>&1; then
+  if sudo -n true >/dev/null 2>&1; then
+    install_dir="$SYSTEM_INSTALL_DIR"
+    sudo install -m 0755 "$src_bin" "$install_dir/$BINARY_NAME"
+    echo "Installiert: $install_dir/$BINARY_NAME"
+    echo "Fertig. Du kannst direkt 'guard version' ausfuehren."
+    exit 0
+  fi
+fi
+
+install_dir="$USER_INSTALL_DIR"
+mkdir -p "$install_dir"
+install -m 0755 "$src_bin" "$install_dir/$BINARY_NAME"
+
+shell_name="$(basename "${SHELL:-}")"
+case "$shell_name" in
+  bash) append_path_if_needed "$HOME/.bashrc" ;;
+  zsh) append_path_if_needed "$HOME/.zshrc" ;;
+  *)
+    append_path_if_needed "$HOME/.profile"
+    ;;
+esac
+
+echo "Installiert: $install_dir/$BINARY_NAME"
+echo "PATH wurde dauerhaft erweitert (falls noetig)."
+echo "Bitte Terminal neu oeffnen oder einmalig ausfuehren:"
+echo '  export PATH="$HOME/.local/bin:$PATH"'

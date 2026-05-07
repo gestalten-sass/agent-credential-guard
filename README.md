@@ -8,6 +8,8 @@ Linux-first Guardrail gegen Secret-Leaks in AI-Agent- und Git-Workflows.
 curl -fsSL https://raw.githubusercontent.com/gestalten-sass/agent-credential-guard/master/scripts/install.sh | bash
 ```
 
+Der Installer nutzt bevorzugt `/usr/local/bin`. Falls das nicht moeglich ist, installiert er nach `~/.local/bin` und traegt den PATH dauerhaft in deine Shell-Config ein.
+
 ## Schnellstart
 
 ```bash
