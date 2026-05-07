@@ -10,11 +10,11 @@ curl -fsSL https://raw.githubusercontent.com/gestalten-sass/agent-credential-gua
 
 Der Installer nutzt bevorzugt `/usr/local/bin`. Falls das nicht moeglich ist, installiert er nach `~/.local/bin` und traegt den PATH dauerhaft in deine Shell-Config ein.
 
-## Schnellstart
+## Schnellstart (alle Repos auf diesem Rechner)
 
 ```bash
-guard init
-guard hook install
+guard hook install --global
+guard hook status --global
 ```
 
 ## CLI
@@ -25,6 +25,9 @@ guard hook install
 - `guard scan --strict`
 - `guard hook install`
 - `guard hook remove`
+- `guard hook install --global`
+- `guard hook remove --global`
+- `guard hook status --global`
 - `guard version`
 
 ## Konfiguration

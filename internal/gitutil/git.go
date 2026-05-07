@@ -48,6 +48,36 @@ func HookPath() (string, error) {
 	return strings.TrimSpace(out), nil
 }
 
+func GetGlobalHooksPath() (string, error) {
+	out, err := runGit("config", "--global", "--get", "core.hooksPath")
+	if err != nil {
+		if strings.Contains(err.Error(), "exit status 1") {
+			return "", nil
+		}
+		return "", err
+	}
+	return strings.TrimSpace(out), nil
+}
+
+func SetGlobalHooksPath(path string) error {
+	_, err := runGit("config", "--global", "core.hooksPath", path)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UnsetGlobalHooksPath() error {
+	_, err := runGit("config", "--global", "--unset", "core.hooksPath")
+	if err != nil {
+		if strings.Contains(err.Error(), "exit status 5") || strings.Contains(err.Error(), "exit status 1") {
+			return nil
+		}
+		return err
+	}
+	return nil
+}
+
 func runGit(args ...string) (string, error) {
 	cmd := exec.Command("git", args...)
 	var stdout bytes.Buffer

@@ -92,13 +92,31 @@ func runScan(args []string) int {
 }
 
 func runHook(args []string) int {
-	if len(args) < 1 {
-		fmt.Fprintln(os.Stderr, "hook erwartet ein subkommando: install|remove")
+	global := false
+	rest := make([]string, 0, len(args))
+	for _, a := range args {
+		if a == "--global" {
+			global = true
+			continue
+		}
+		rest = append(rest, a)
+	}
+	if len(rest) < 1 {
+		fmt.Fprintln(os.Stderr, "hook erwartet ein subkommando: install|remove|status")
 		return 1
 	}
 
-	switch args[0] {
+	switch rest[0] {
 	case "install":
+		if global {
+			p, err := hook.InstallGlobal()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "hook install --global fehlgeschlagen: %v\n", err)
+				return 1
+			}
+			fmt.Printf("guard: globaler pre-commit hook installiert (%s)\n", p)
+			return 0
+		}
 		if err := hook.Install(); err != nil {
 			fmt.Fprintf(os.Stderr, "hook install fehlgeschlagen: %v\n", err)
 			return 1
@@ -106,6 +124,19 @@ func runHook(args []string) int {
 		fmt.Println("guard: pre-commit hook installiert")
 		return 0
 	case "remove":
+		if global {
+			removed, err := hook.RemoveGlobal()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "hook remove --global fehlgeschlagen: %v\n", err)
+				return 1
+			}
+			if removed {
+				fmt.Println("guard: globaler pre-commit hook entfernt")
+			} else {
+				fmt.Println("guard: kein globaler guard-hook gefunden")
+			}
+			return 0
+		}
 		removed, err := hook.Remove()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "hook remove fehlgeschlagen: %v\n", err)
@@ -117,8 +148,28 @@ func runHook(args []string) int {
 			fmt.Println("guard: kein guard-hook gefunden, nichts entfernt")
 		}
 		return 0
+	case "status":
+		if global {
+			enabled, path, err := hook.GlobalStatus()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "hook status --global fehlgeschlagen: %v\n", err)
+				return 1
+			}
+			if enabled {
+				fmt.Printf("guard: global aktiv (%s)\n", path)
+				return 0
+			}
+			if path == "" {
+				fmt.Println("guard: global inaktiv (core.hooksPath nicht gesetzt)")
+			} else {
+				fmt.Printf("guard: global inaktiv (anderer core.hooksPath: %s)\n", path)
+			}
+			return 1
+		}
+		fmt.Println("guard: fuer lokalen status pruefe .git/hooks/pre-commit")
+		return 0
 	default:
-		fmt.Fprintf(os.Stderr, "unbekanntes hook-subkommando: %s\n", args[0])
+		fmt.Fprintf(os.Stderr, "unbekanntes hook-subkommando: %s\n", rest[0])
 		return 1
 	}
 }
@@ -129,7 +180,8 @@ func printUsage() {
 	fmt.Println("Kommandos:")
 	fmt.Println("  init")
 	fmt.Println("  scan [--env] [--strict]")
-	fmt.Println("  hook install")
-	fmt.Println("  hook remove")
+	fmt.Println("  hook install [--global]")
+	fmt.Println("  hook remove [--global]")
+	fmt.Println("  hook status [--global]")
 	fmt.Println("  version")
 }
