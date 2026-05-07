@@ -9,6 +9,7 @@ curl -fsSL https://raw.githubusercontent.com/gestalten-sass/agent-credential-gua
 ```
 
 Der Installer nutzt bevorzugt `/usr/local/bin`. Falls das nicht moeglich ist, installiert er nach `~/.local/bin` und traegt den PATH dauerhaft in deine Shell-Config ein.
+Am Ende fragt der Installer direkt, ob der globale Git-Hook automatisch aktiviert werden soll.
 
 ## Schnellstart (alle Repos auf diesem Rechner)
 

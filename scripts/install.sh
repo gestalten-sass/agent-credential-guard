@@ -27,6 +27,28 @@ append_path_if_needed() {
   fi
 }
 
+maybe_install_global_hook() {
+  local guard_bin="$1"
+
+  if [[ ! -t 0 ]]; then
+    echo "Hinweis: Kein interaktives Terminal. Globalen Hook manuell aktivieren mit:"
+    echo "  guard hook install --global"
+    return
+  fi
+
+  printf "Globalen Git-Pre-Commit-Hook jetzt aktivieren? [Y/n] "
+  read -r answer
+  case "${answer:-Y}" in
+    Y|y|"")
+      "$guard_bin" hook install --global
+      "$guard_bin" hook status --global || true
+      ;;
+    *)
+      echo "Uebersprungen. Du kannst spaeter aktivieren mit: guard hook install --global"
+      ;;
+  esac
+}
+
 need_cmd curl
 need_cmd tar
 
@@ -64,16 +86,15 @@ if [[ -w "$SYSTEM_INSTALL_DIR" ]]; then
   install_dir="$SYSTEM_INSTALL_DIR"
   install -m 0755 "$src_bin" "$install_dir/$BINARY_NAME"
   echo "Installiert: $install_dir/$BINARY_NAME"
-  echo "Fertig. Du kannst direkt 'guard version' ausfuehren."
+  maybe_install_global_hook "$install_dir/$BINARY_NAME"
   exit 0
 fi
 
 if command -v sudo >/dev/null 2>&1; then
-  if sudo -n true >/dev/null 2>&1; then
-    install_dir="$SYSTEM_INSTALL_DIR"
-    sudo install -m 0755 "$src_bin" "$install_dir/$BINARY_NAME"
+  install_dir="$SYSTEM_INSTALL_DIR"
+  if sudo install -m 0755 "$src_bin" "$install_dir/$BINARY_NAME"; then
     echo "Installiert: $install_dir/$BINARY_NAME"
-    echo "Fertig. Du kannst direkt 'guard version' ausfuehren."
+    maybe_install_global_hook "$install_dir/$BINARY_NAME"
     exit 0
   fi
 fi
@@ -95,3 +116,4 @@ echo "Installiert: $install_dir/$BINARY_NAME"
 echo "PATH wurde dauerhaft erweitert (falls noetig)."
 echo "Bitte Terminal neu oeffnen oder einmalig ausfuehren:"
 echo '  export PATH="$HOME/.local/bin:$PATH"'
+maybe_install_global_hook "$install_dir/$BINARY_NAME"
