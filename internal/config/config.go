@@ -1,14 +1,13 @@
 package config
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"agent-credential-guard/internal/gitutil"
+	"gopkg.in/yaml.v3"
 )
 
 const ExampleYAML = `enabled_rules:
@@ -23,9 +22,9 @@ strict_mode: false
 `
 
 type Config struct {
-	EnabledRules []string
-	IgnorePaths  []string
-	StrictMode   bool
+	EnabledRules []string `yaml:"enabled_rules"`
+	IgnorePaths  []string `yaml:"ignore_paths"`
+	StrictMode   bool     `yaml:"strict_mode"`
 }
 
 func Load() (Config, error) {
@@ -69,37 +68,10 @@ func InitFile() (string, error) {
 
 func Parse(r io.Reader) (Config, error) {
 	cfg := Config{}
-	s := bufio.NewScanner(r)
-	section := ""
-	for s.Scan() {
-		line := strings.TrimSpace(s.Text())
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		if strings.HasSuffix(line, ":") {
-			section = strings.TrimSuffix(line, ":")
-			continue
-		}
-		if strings.HasPrefix(line, "strict_mode:") {
-			v := strings.TrimSpace(strings.TrimPrefix(line, "strict_mode:"))
-			cfg.StrictMode = (v == "true")
-			continue
-		}
-		if strings.HasPrefix(line, "- ") {
-			v := strings.TrimSpace(strings.TrimPrefix(line, "- "))
-			v = strings.Trim(v, "\"'")
-			switch section {
-			case "enabled_rules":
-				cfg.EnabledRules = append(cfg.EnabledRules, v)
-			case "ignore_paths":
-				cfg.IgnorePaths = append(cfg.IgnorePaths, v)
-			}
-		}
+	dec := yaml.NewDecoder(r)
+	dec.KnownFields(true)
+	if err := dec.Decode(&cfg); err != nil {
+		return Config{}, err
 	}
-
-	if err := s.Err(); err != nil {
-		return cfg, err
-	}
-
 	return cfg, nil
 }

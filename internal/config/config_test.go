@@ -31,3 +31,13 @@ strict_mode: true
 		t.Fatalf("expected 2 ignore paths, got %d", len(cfg.IgnorePaths))
 	}
 }
+
+func TestParseUnknownFieldFails(t *testing.T) {
+	in := `strict_mode: false
+unknown: value
+`
+	_, err := Parse(strings.NewReader(in))
+	if err == nil {
+		t.Fatalf("expected error for unknown field")
+	}
+}

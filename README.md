@@ -2,6 +2,22 @@
 
 Linux-first Guardrail gegen Secret-Leaks in AI-Agent- und Git-Workflows.
 
+## Projektstatus
+
+`v0.1` (fruehe, bewusst fokussierte Version).
+
+## Was es bewusst ist (v0.1)
+
+- schneller lokaler Guardrail fuer Commit-Workflows
+- Scan auf staged Diff und `.env*`
+- einfache, transparente Regelbasis
+
+## Was es bewusst nicht ist (v0.1)
+
+- kein Enterprise-DLP- oder Compliance-Scanner
+- kein Full-History- oder Full-Repo-Scanner
+- keine perfekte Secret-Erkennung ohne False Positives/Negatives
+
 ## Installation (ohne Go)
 
 ```bash
