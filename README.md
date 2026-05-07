@@ -25,6 +25,7 @@ curl -fsSL https://raw.githubusercontent.com/gestalten-sass/agent-credential-gua
 ```
 
 Der Installer nutzt bevorzugt `/usr/local/bin`. Falls das nicht moeglich ist, installiert er nach `~/.local/bin` und traegt den PATH dauerhaft in deine Shell-Config ein.
+Wenn `sudo` in nicht-interaktiven Umgebungen kein Passwort lesen kann, faellt der Installer automatisch auf `~/.local/bin` zurueck.
 
 ## Optional: global fuer alle Repos aktivieren
 
