@@ -1,0 +1,14 @@
+# Build output
+guard
+
+# Local runtime/config
+.guard.yaml
+.env
+.env.*
+
+# OS noise
+.DS_Store
+
+# Internal planning/context (nicht veroeffentlichen)
+PLAN.md
+CONVERSATION_CONTEXT.md

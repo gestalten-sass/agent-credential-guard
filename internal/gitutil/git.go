@@ -15,10 +15,27 @@ func RepoRoot() (string, error) {
 	return strings.TrimSpace(out), nil
 }
 
-func StagedDiff() (string, error) {
-	out, err := runGit("diff", "--staged", "--no-color")
+func StagedFiles() ([]string, error) {
+	out, err := runGit("diff", "--staged", "--name-only")
 	if err != nil {
-		return "", fmt.Errorf("staged diff nicht lesbar: %w", err)
+		return nil, fmt.Errorf("staged dateien nicht lesbar: %w", err)
+	}
+	lines := strings.Split(strings.TrimSpace(out), "\n")
+	res := make([]string, 0, len(lines))
+	for _, l := range lines {
+		l = strings.TrimSpace(l)
+		if l == "" {
+			continue
+		}
+		res = append(res, l)
+	}
+	return res, nil
+}
+
+func StagedDiffForFile(path string) (string, error) {
+	out, err := runGit("diff", "--staged", "--no-color", "--", path)
+	if err != nil {
+		return "", fmt.Errorf("staged diff fuer %s nicht lesbar: %w", path, err)
 	}
 	return out, nil
 }

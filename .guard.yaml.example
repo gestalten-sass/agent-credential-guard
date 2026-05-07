@@ -1,0 +1,9 @@
+enabled_rules:
+  - aws_access_key
+  - github_token
+  - private_key
+  - generic_api_key
+ignore_paths:
+  - .env.local
+  - secrets/*.txt
+strict_mode: false

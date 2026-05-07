@@ -2,24 +2,54 @@
 
 Linux-first Guardrail gegen Secret-Leaks in AI-Agent- und Git-Workflows.
 
-## Status
+## Build
 
-Planungsstart abgeschlossen, Umsetzung folgt.
+```bash
+go build -o guard ./cmd/guard
+```
 
-## Ziel
+## Installation
 
-Secrets erkennen, bevor sie versehentlich in Commits oder Workflows landen.
+```bash
+go install ./cmd/guard
+# oder
+./scripts/install.sh
+```
 
-## Geplanter v1 Umfang
+Hinweis: Stelle sicher, dass `$(go env GOPATH)/bin` in deinem `PATH` liegt.
 
-- Go CLI
-- Pre-commit Hook Integration
-- Scan auf staged Diff
-- Scan auf `.env*`
-- Warnmodus als Default
+## Schnellstart
 
-## Dokumente
+```bash
+guard init
+guard hook install
+```
 
-- `PLAN.md`
-- `CONVERSATION_CONTEXT.md`
+## CLI
 
+- `guard init`
+- `guard scan`
+- `guard scan --env`
+- `guard scan --strict`
+- `guard hook install`
+- `guard hook remove`
+- `guard version`
+
+## Konfiguration
+
+Optional im Repo-Root: `.guard.yaml`
+
+- `enabled_rules`
+- `ignore_paths`
+- `strict_mode`
+
+Beispiel: `.guard.yaml.example`
+
+## Beispiele
+
+- `examples/staged-secret/README.md`
+- `examples/env-secret/README.md`
+
+## Changelog
+
+- `CHANGELOG.md`

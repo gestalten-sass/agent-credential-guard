@@ -26,11 +26,16 @@ func Install() error {
 		return err
 	}
 
+	exe, err := os.Executable()
+	if err != nil {
+		return err
+	}
+
 	content := strings.Join([]string{
 		"#!/usr/bin/env bash",
 		marker,
 		"set -euo pipefail",
-		"guard scan --env",
+		fmt.Sprintf("\"%s\" scan --env", exe),
 		"",
 	}, "\n")
 

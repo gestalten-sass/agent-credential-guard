@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"agent-credential-guard/internal/config"
 	"agent-credential-guard/internal/hook"
 	"agent-credential-guard/internal/scanner"
 )
@@ -23,6 +24,8 @@ func main() {
 		os.Exit(runScan(os.Args[2:]))
 	case "hook":
 		os.Exit(runHook(os.Args[2:]))
+	case "init":
+		os.Exit(runInit())
 	case "version":
 		fmt.Println(version)
 		return
@@ -36,21 +39,38 @@ func main() {
 	}
 }
 
+func runInit() int {
+	p, err := config.InitFile()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "init fehlgeschlagen: %v\n", err)
+		return 1
+	}
+	fmt.Printf("guard: config angelegt: %s\n", p)
+	return 0
+}
+
 func runScan(args []string) int {
 	fs := flag.NewFlagSet("scan", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 	includeEnv := fs.Bool("env", false, "scannt zusaetzlich .env* dateien")
-	strict := fs.Bool("strict", false, "liefert exit code 1 bei treffern")
+	strictFlag := fs.Bool("strict", false, "liefert exit code 1 bei treffern")
 	if err := fs.Parse(args); err != nil {
 		return 1
 	}
 
-	report, err := scanner.Run(scanner.Options{IncludeEnv: *includeEnv})
+	cfg, err := config.Load()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "config konnte nicht geladen werden: %v\n", err)
+		return 1
+	}
+
+	report, err := scanner.Run(scanner.Options{IncludeEnv: *includeEnv, Config: cfg})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "scan fehlgeschlagen: %v\n", err)
 		return 1
 	}
 
+	strict := *strictFlag || cfg.StrictMode
 	if len(report.Findings) == 0 {
 		fmt.Println("guard: keine secrets gefunden")
 		return 0
@@ -59,9 +79,10 @@ func runScan(args []string) int {
 	fmt.Printf("guard: %d potentiell kritische treffer gefunden\n", len(report.Findings))
 	for _, f := range report.Findings {
 		fmt.Printf("- [%s] %s\n", f.Rule, f.Location)
+		fmt.Printf("  -> fix: %s\n", scanner.HintForRule(f.Rule))
 	}
 
-	if *strict {
+	if strict {
 		fmt.Println("guard: strict aktiv, commit wird blockiert")
 		return 1
 	}
@@ -106,6 +127,7 @@ func printUsage() {
 	fmt.Println("guard <kommando>")
 	fmt.Println("")
 	fmt.Println("Kommandos:")
+	fmt.Println("  init")
 	fmt.Println("  scan [--env] [--strict]")
 	fmt.Println("  hook install")
 	fmt.Println("  hook remove")
