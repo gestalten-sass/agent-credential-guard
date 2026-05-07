@@ -20,25 +20,23 @@ Linux-first Guardrail gegen Secret-Leaks in AI-Agent- und Git-Workflows.
 
 ## Installation (ohne Go)
 
-Standard:
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gestalten-sass/agent-credential-guard/master/scripts/install.sh | bash
 ```
 
-Vollautomatisch inkl. globalem Hook:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/gestalten-sass/agent-credential-guard/master/scripts/install.sh | GUARD_AUTO_HOOK=1 bash
-```
-
 Der Installer nutzt bevorzugt `/usr/local/bin`. Falls das nicht moeglich ist, installiert er nach `~/.local/bin` und traegt den PATH dauerhaft in deine Shell-Config ein.
 
-## Schnellstart (alle Repos auf diesem Rechner)
+## Optional: global fuer alle Repos aktivieren
 
 ```bash
 guard hook install --global
 guard hook status --global
+```
+
+## Power-User (One-Liner inkl. Auto-Hook)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gestalten-sass/agent-credential-guard/master/scripts/install.sh | GUARD_AUTO_HOOK=1 bash
 ```
 
 ## CLI
