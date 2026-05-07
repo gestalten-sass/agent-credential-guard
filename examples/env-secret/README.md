@@ -2,7 +2,7 @@
 
 ```bash
 cd /pfad/zu/deinem/repo
-echo 'API_KEY=1234567890abcdef' > .env
+echo 'API_KEY=EXAMPLE_DEMO_KEY_123456' > .env
 guard scan --env
 ```
 

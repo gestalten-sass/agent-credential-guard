@@ -32,7 +32,7 @@ func TestIgnored(t *testing.T) {
 
 func TestScanLine(t *testing.T) {
 	rs := selectedRules(config.Config{})
-	findings := scanLine(rs, ".env", 1, "API_KEY=1234567890abcdef")
+	findings := scanLine(rs, ".env", 1, "API_KEY=EXAMPLE_TEST_KEY_123456")
 	if len(findings) == 0 {
 		t.Fatalf("expected finding")
 	}

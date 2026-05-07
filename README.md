@@ -74,6 +74,7 @@ go build -o guard ./cmd/guard
 
 - `examples/staged-secret/README.md`
 - `examples/env-secret/README.md`
+- Alle dort gezeigten Secret-Werte sind absichtlich nur Platzhalter fuer Demo-Zwecke.
 
 ## Changelog
 

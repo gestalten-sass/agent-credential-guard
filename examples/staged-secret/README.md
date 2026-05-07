@@ -2,7 +2,7 @@
 
 ```bash
 cd /pfad/zu/deinem/repo
-echo 'TOKEN=1234567890abcdef' > demo.txt
+echo 'TOKEN=EXAMPLE_DEMO_TOKEN_123456' > demo.txt
 git add demo.txt
 guard scan
 ```

@@ -84,8 +84,8 @@ func TestScanEnvHonorsIgnoreAndStrict(t *testing.T) {
 	repo := t.TempDir()
 	mustRun(t, repo, "git", "init")
 	mustWrite(t, filepath.Join(repo, ".guard.yaml"), "ignore_paths:\n  - .env.ignore\nstrict_mode: true\n")
-	mustWrite(t, filepath.Join(repo, ".env"), "API_KEY=1234567890abcdef\n")
-	mustWrite(t, filepath.Join(repo, ".env.ignore"), "API_KEY=1234567890abcdef\n")
+	mustWrite(t, filepath.Join(repo, ".env"), "API_KEY=EXAMPLE_E2E_KEY_123456\n")
+	mustWrite(t, filepath.Join(repo, ".env.ignore"), "API_KEY=EXAMPLE_E2E_KEY_123456\n")
 
 	out, code := runGuard(t, repo, nil, "scan", "--env")
 	if code != 1 {
